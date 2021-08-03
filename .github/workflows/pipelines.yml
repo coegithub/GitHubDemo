@@ -6,9 +6,9 @@ name: Deploy to Salesforce Pipeline
 # events but only for the master branch
 on:
   push:
-    branches: [ dev ]
+    branches: [ master ]
   pull_request:
-    branches: [ dev ]
+    branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,10 +33,10 @@ jobs:
     # Authorize SF Org
     - name: Authorize SF Org
       env:
-        CLIENT_ID: ${{ secrets.SALESFORCEDEVCLIENTID }}
-        USERNAME: ${{ secrets.SALESFORCEDEVUSERNAME }}
-        INSTANCE_URL: ${{ secrets.SALESFORCEDEVINSTANCEURL }}
-      run: sfdx force:auth:jwt:grant --clientid $CLIENT_ID --jwtkeyfile ./buildfiles/server.key --username $USERNAME --instanceurl $INSTANCE_URL -a dev
+        CLIENT_ID: ${{ secrets.SALESFORCEPRODCLIENTID }}
+        USERNAME: ${{ secrets.SALESFORCEPRODUSERNAME }}
+        INSTANCE_URL: ${{ secrets.SALESFORCEPRODINSTANCEURL }}
+      run: sfdx force:auth:jwt:grant --clientid $CLIENT_ID --jwtkeyfile ./buildfiles/server.key --username $USERNAME --instanceurl $INSTANCE_URL -a prod
 
     # Convert to Deploy Source
     - name: Convert to Deploy Source
@@ -44,8 +44,8 @@ jobs:
     
     # Run Validation of Deploy Source
     - name: Run Validation on Deploy Source
-      run: sfdx force:mdapi:deploy -l RunLocalTests -c -d ./toDeploy -u dev -w 10
+      run: sfdx force:mdapi:deploy -l RunLocalTests -c -d ./toDeploy -u prod -w 10
     
     # Deploy
     - name : Deploy to SF Org
-      run: sfdx force:mdapi:deploy -l RunLocalTests -d ./toDeploy -u dev -w 10
+      run: sfdx force:mdapi:deploy -l RunLocalTests -d ./toDeploy -u prod -w 10
